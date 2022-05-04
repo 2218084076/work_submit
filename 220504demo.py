@@ -2,6 +2,12 @@ import asyncio
 from playwright.async_api import async_playwright
 import pymysql
 import requests
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter('%(asctime)s %(filename)s %(funcName)s [line:%(lineno)d] %(levelname)s %(message)s')
 
 ip_list = [{'ip': '210.26.124.143', 'mark': ''}, {'ip': '106.75.226.36', 'mark': ''},
            {'ip': '125.62.26.197', 'mark': ''}, {'ip': '120.92.74.237', 'mark': ''},
