@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/get_customs_data" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/pythonic-project-guidelines" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/sampleproject" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/workspace" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/workspace/get_data" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/workspace/get_data/get_data" vcs="Git" />
+  </component>
+</project>
