@@ -1,15 +1,19 @@
 import asyncio
+import json
+import random
+import time
 from playwright.async_api import async_playwright
 import pymysql
 import requests
 import logging
+import MySQLdb
 
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-
-formatter = logging.Formatter('%(asctime)s %(filename)s %(funcName)s [line:%(lineno)d] %(levelname)s %(message)s')
-
-ip_list = [{'ip': '210.26.124.143', 'mark': ''}, {'ip': '106.75.226.36', 'mark': ''},
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+ip_list = [{'ip': '免费代理 ip', 'title': '服务器地址', 'mark': ''}, {'ip': '210.26.124.143', 'mark': ''},
+           {'ip': '106.75.226.36', 'mark': ''},
            {'ip': '125.62.26.197', 'mark': ''}, {'ip': '120.92.74.237', 'mark': ''},
            {'ip': '120.92.74.189', 'mark': ''}, {'ip': '218.60.8.99', 'mark': ''}, {'ip': '218.60.8.83', 'mark': ''},
            {'ip': '101.37.79.125', 'mark': ''}, {'ip': '113.200.56.13', 'mark': ''}, {'ip': '106.12.32.43', 'mark': ''},
@@ -57,50 +61,63 @@ ip_list = [{'ip': '210.26.124.143', 'mark': ''}, {'ip': '106.75.226.36', 'mark':
            {'ip': '140.207.147.69', 'mark': ''}, {'ip': '113.135.219.161', 'mark': ''},
            {'ip': '119.180.146.127', 'mark': ''}]
 
+now_time = time.strftime("%Y-%m-%d.%H.%M", time.localtime())
 
-async def main():
+
+async def get_proxy_ip():
+    """
+    Browser Action get proxy IP
+    """
     async with async_playwright() as p:
+        result_ip_list = []
         browser_type = p.webkit
         browser = await browser_type.launch(headless=False)
         page = await browser.new_page()
-        await page.goto('http://ip.yqie.com/proxyhttps/index_1.htm')
-        n = 1
-        result_ip_list = []
-        json_list = await page.evaluate('''
-get_ip = function() {
-  var a, i, json, l, _i, _len;
-  l = [];
-  a = document.getElementsByTagName("tr");
-  for (_i = 0, _len = a.length; _i < _len; _i++) {
-    i = a[_i];
-    json = {
-      "ip": i.innerText.split("\t")[1],
-      "title": i.innerText.split("\t")[3],
-      "mark": ""
-    };
-    l.push(json);
-  }
-  return l;
-};
-        ''')
-        result_json = {
-            'page%s' % n: json_list
-        }
-        result_ip_list.append(result_json)
-        print(json_list)
+        await page.goto('http://ip.yqie.com/proxyhttps/index.htm')
+        await page.wait_for_timeout(random.randint(300, 500))
+        last_page = await page.evaluate(
+            'document.getElementsByTagName("a")[21].getAttribute("href").split("_")[1].split(".")[0]')
+        for p in range(1, int(last_page)):
+            await page.goto('http://ip.yqie.com/proxyhttps/index_%s.htm' % p)
+            await page.wait_for_timeout(random.randint(500, 2000))
+            logging.debug('go to page-%s' % p)
+            json_list = await page.evaluate('''
+get_proxy_ip = function () {
+    l = []
+    a = document.getElementsByTagName('tr');
+    for (var i = 0; i < a.length; i++) {
+        json = {
+            'ip': a[i].innerText.split('\t')[1],
+            "title": a[i].innerText.split("\t")[3],
+            "mark": ""
+        };
+        l.push(json);
+    }
+    return l
+}
+            ''')
+            result_json = {
+                'page%s' % p: json_list
+            }
+            result_ip_list.append(result_json)
+            logging.debug('%s' % result_json)
+            save_local_json_file(result_ip_list)
         await browser.close()
 
 
+def filter_ip(ip):
+    temp_l = []
+    separate_ip = ip.split('.')
+    if len(separate_ip) == 1:
+        logging.debug('This is not an IP--%s' % ip)
+    else:
+        temp_l.append(ip)
+        logging.debug('Reasonable IP--%s' % ip)
+    return temp_l
+
+
 def insert_ip_pool():
-    conn = pymysql.connect(
-        host='localhost',
-        port=3306,
-        user='root',
-        passwd='123qweasd',
-        db='ip_pool',
-        charset='utf-8',
-    )
-    cur = conn.cursor()
+    db = MySQLdb.connect('localhost','root','123qweasd','')
 
 
 def try_ip(ip_json_list):
@@ -135,7 +152,7 @@ def check_proxy(ip_json_list, port):
             # print(thisIP)
             res = requests.get(url="http://icanhazip.com/", timeout=2, proxies={"http": proxy})
             proxyIP = res.text
-            if (proxyIP == proxy):
+            if proxyIP == proxy:
                 print("代理IP:'" + proxyIP + "'有效！")
                 return True
             else:
@@ -146,5 +163,12 @@ def check_proxy(ip_json_list, port):
             return False
 
 
-try_ip(ip_list)
-# asyncio.get_event_loop().run_until_complete(main())
+def save_local_json_file(result_ip_list):
+    with open('proxy_ip.json', 'w', encoding='utf-8') as file_obj:
+        listarr = json.dumps(result_ip_list, ensure_ascii=False)
+        file_obj.write(listarr)
+
+
+# for i in ip_list:
+#     print(filter_ip('%s\t' % i['ip']), i['ip'])
+# asyncio.get_event_loop().run_until_complete(get_proxy_ip())
