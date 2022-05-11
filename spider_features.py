@@ -13,8 +13,6 @@ url2 = 'https://geonode.com/free-proxy-list/'
 url_h = 'https://proxy.mimvp.com/freeopen?proxy=out_hp'
 
 
-# 'https://proxy.mimvp.com/freeopen?proxy=out_hp'
-
 def read_yml_file(file: str):
     with open(file, 'r') as obj:
         try:
@@ -28,11 +26,10 @@ def spider_json(url: str):
     now = datetime.datetime.now()
     now_time = now.strftime('%Y.%m.%d,%H:%M:%S')
     response = httpx.get(url)
+    print(response)
     result_list = []
     page_info = response.text
-    print(type(page_info))
     pagr_json = json.loads(page_info)
-    print(pagr_json)
     try:
         for j in pagr_json:
             ip = j.get('ip')
@@ -86,6 +83,16 @@ def spider_html(url: str):
     return result_list
 
 
+def test_kwargs(**kwargs):
+    # if kwargs is not None:
+    #     for key, value in kwargs.iteritems():
+    #         print("{} = {}".format(key, value))
+    # Or you can visit kwargs like a dict() object
+    for key in kwargs:
+        print("{} = {}".format(key, kwargs[key]))
+
+
+# test_kwargs(name="python", value="5")
 # read_yml_file(config_file)
 # print(spider_json(url1))
 for s in spider_html(url_h):
