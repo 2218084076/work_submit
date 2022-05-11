@@ -11,7 +11,7 @@ BOT_NAME = 'proxypool'
 
 SPIDER_MODULES = ['proxypool.spiders']
 NEWSPIDER_MODULE = 'proxypool.spiders'
-
+FEED_EXPORT_ENCODING = 'utf-8' # 将其指定为utf-8 json编码
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'proxypool (+http://www.yourdomain.com)'
