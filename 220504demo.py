@@ -111,9 +111,8 @@ def filter_ip(ip):
     if len(separate_ip) == 1:
         logging.debug('This is not an IP--%s' % ip)
     else:
-        temp_l.append(ip)
         logging.debug('Reasonable IP--%s' % ip)
-    return temp_l
+        return ip
 
 
 def insert_ip_pool():
