@@ -9,7 +9,9 @@ class Spider(scrapy.spiders.Spider):
     start_urls = [
         'https://proxy.mimvp.com/freeopen?proxy=out_hp',
         'https://proxy.mimvp.com/freeopen?proxy=out_hp&sort=p_ip&page=2',
-        'https://proxy.mimvp.com/freeopen?proxy=out_hp&sort=p_ip&page=3'
+        'https://proxy.mimvp.com/freeopen?proxy=out_hp&sort=p_ip&page=3',
+        'https://proxy.mimvp.com/freeopen?proxy=out_hp&sort=p_ip&page=4',
+
     ]
 
     def parse(self, response, **kwargs):
