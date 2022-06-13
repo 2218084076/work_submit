@@ -1,11 +1,12 @@
 import json
 import random
 import time
+from typing import Dict, Any
 
-import requests
+import httpx
 
 
-def ipquery(ip: str) -> str:
+def ipquery(ip: str) -> dict[str, str | Any]:
     """
     Get the region of the IP
     :param ip:
@@ -13,12 +14,18 @@ def ipquery(ip: str) -> str:
     """
     url = "http://ip.taobao.com/outGetIpInfo?ip={}&accessKey=alibaba-inc".format(ip)
     time.sleep(random.randint(1, 3))
-    req = requests.get(url).text
-    json1 = json.loads(req)
+    req = httpx.get(url)
+    json1 = json.loads(req.text)
     country = json1.get("data").get("country")  # 国
     province = json1.get("data").get("region").replace('XX', '')  # 省
     city = json1.get("data").get("city").replace('XX', '')  # 市
-    return '{}：{} {} {}'.format(ip, country, province, city)
+    ip_info = {
+        'ip': ip,
+        'country': country,
+        'province': province,
+        'city': city,
+    }
+    return ip_info
     # ip-api接口
     # url = "http://ip-api.com/json/%s?lang=zh-CN" % ip
     # time.sleep(random.randint(1, 3))
@@ -39,6 +46,7 @@ def ipquery(ip: str) -> str:
     # city = json1.get('city')  # 市
 
 
+# ip_list = ['121.37.31.195']
 ip_list = ['121.37.31.195', '120.42.46.226', '218.1.200.202', '210.5.10.87', '118.193.47.193', '175.24.112.3',
            '124.156.100.83', '58.220.95.40', '117.34.25.11', '116.63.170.189', '98.162.96.41', '98.170.57.231',
            '95.43.42.100', '193.84.184.25', '94.26.108.67', '93.184.151.48', '193.163.116.29']
